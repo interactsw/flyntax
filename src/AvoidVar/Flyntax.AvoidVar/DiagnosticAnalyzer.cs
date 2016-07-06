@@ -70,7 +70,7 @@ namespace Flyntax.AvoidVar
                 return;
             }
 
-            if (TypeIsExplicitInInitializer(declaration))
+            if (TypeIsExplicitInInitializer(declaration, declarationTypeSymbol, context))
             {
                 return;
             }
@@ -99,18 +99,25 @@ namespace Flyntax.AvoidVar
             return namedTypeSymbol.TypeArguments.Any(IsUnspeakable);
         }
 
-        // The goal here is for the type of the variable to be immediately clear to anyone reading
+        // Our goal is for the type of any variable to be immediately clear to anyone reading
         // the code, without having to perform type inference in their head. There are several
         // common uses of var in which the type is explicit in the initializer, e.g.:
         //  var x = (int) Foo();
         //  var y = new List<int>();
         //  var z = foo.Bar<int>();
+        //  var q = MyType.DefaultInstance;
+        //  var w = MyType.FromFoo(foo);
         // We don't want to force developers to repeat themselves thus:
         //  int x = (int) Foo();
         //  List<int> y = new List<int>();
         //  int z = foo.Bar<int>();
+        //  MyType q = MyType.DefaultInstance;
+        //  MyType w = MyType.FromFoo(foo);
         // So in these cases, we do not want to issue a diagnostic.
-        private static bool TypeIsExplicitInInitializer(VariableDeclarationSyntax declaration)
+        private static bool TypeIsExplicitInInitializer(
+            VariableDeclarationSyntax declaration,
+            ITypeSymbol declarationTypeSymbol,
+            SyntaxNodeAnalysisContext context)
         {
             ExpressionSyntax variableInitializer = declaration.Variables[0].Initializer.Value;
             if (variableInitializer is CastExpressionSyntax)
@@ -131,17 +138,36 @@ namespace Flyntax.AvoidVar
                 //  var x = new List<int>();
                 return true;
             }
+
+            MemberAccessExpressionSyntax memberAccess = null;
             var invocation = variableInitializer as InvocationExpressionSyntax;
             if (invocation != null)
             {
-                var memberAccess = invocation.Expression as MemberAccessExpressionSyntax;
+                memberAccess = invocation.Expression as MemberAccessExpressionSyntax;
                 if (memberAccess != null)
                 {
                     if (memberAccess.Name is GenericNameSyntax)
                     {
                         return true;
                     }
-                    
+                }
+            }
+            else
+            {
+                memberAccess = variableInitializer as MemberAccessExpressionSyntax;
+            }
+
+            // If the expression is either of the form SomeType.Method() or
+            // SomeType.Property, memberAccess will now be set (and will refer
+            // to either SomeType.Method, or SomeType.Property respectively).
+            if (memberAccess != null)
+            {
+                SymbolInfo symbolInfoForInitializer = context.SemanticModel.GetSymbolInfo(
+                    memberAccess.Expression);
+                var initializerTypeSymbol = (ITypeSymbol) symbolInfoForInitializer.Symbol;
+                if (initializerTypeSymbol == declarationTypeSymbol)
+                {
+                    return true;
                 }
             }
 

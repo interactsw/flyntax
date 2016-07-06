@@ -24,12 +24,14 @@ namespace Flyntax.AvoidVar.Test
                 {0}
             }}
         }}
+{1}
     }}";
 
         protected static readonly DiagnosticResultLocation ResultLocation = new DiagnosticResultLocation("Test0.cs", 15, 17);
 
-        protected static string WrapStatement(string statement) =>
-            string.Format(Skeleton, statement);
+        protected static string WrapStatement(string statement) => WrapStatement(statement, "");
+        protected static string WrapStatement(string statement, string atNamespaceScope) =>
+            string.Format(Skeleton, statement, atNamespaceScope);
 
         protected override CodeFixProvider GetCSharpCodeFixProvider()
         {
@@ -41,9 +43,14 @@ namespace Flyntax.AvoidVar.Test
             return new FlyntaxAvoidVarAnalyzer();
         }
 
+        protected void ShouldNotWarn(string statement, string atNamespaceScope) =>
+            VerifyCSharpDiagnostic(WrapStatement(statement, atNamespaceScope));
         protected void ShouldNotWarn(string statement) => VerifyCSharpDiagnostic(WrapStatement(statement));
 
-        protected void ShouldWarn(string statement, string expectedTypeName)
+        protected void ShouldWarn(string statement, string expectedTypeName) =>
+            ShouldWarn(statement, "", expectedTypeName);
+
+        protected void ShouldWarn(string statement, string atNamespaceScope, string expectedTypeName)
         {
             var expected = new DiagnosticResult
             {
@@ -52,12 +59,19 @@ namespace Flyntax.AvoidVar.Test
                 Severity = DiagnosticSeverity.Warning,
                 Locations = new[] { ResultLocation }
             };
-            VerifyCSharpDiagnostic(WrapStatement(statement), expected);
+            VerifyCSharpDiagnostic(WrapStatement(statement, atNamespaceScope), expected);
         }
 
         protected void ShouldFix(string statement, string fixedStatement)
         {
             VerifyCSharpFix(WrapStatement(statement), WrapStatement(fixedStatement));
         }
+
+        protected static string OtherTypeWithMember(string member) => @"
+        class OtherType
+        {
+            " + member + @"
+        }
+";
     }
 }

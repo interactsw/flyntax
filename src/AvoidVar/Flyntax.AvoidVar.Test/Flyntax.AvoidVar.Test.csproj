@@ -102,6 +102,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnalyzerTests\WhenVarAcceptable\BecauseExpressionLooksLikeFactory.cs" />
+    <Compile Include="AnalyzerTests\WhenVarAvoidable\WhenExpressionIsNonFactoryStaticMemberAccess.cs" />
     <Compile Include="CodeFixTests\WhenTypeArgumentHasNativeAlias.cs" />
     <Compile Include="CodeFixTests\WhenTypeHasNativeAlias.cs" />
     <Compile Include="CodeFixTests\WhenTypeIsPlainClass.cs" />
@@ -119,9 +121,9 @@
     <Compile Include="AnalyzerTests\WhenVarAvoidable\WhenTypeArgumentHasNativeAlias.cs" />
     <Compile Include="AnalyzerTests\WhenVarAvoidable\WhenTypeHasNativeAlias.cs" />
     <Compile Include="AnalyzerTests\WhenVarAvoidable\WhenTypeIsPlainClass.cs" />
-    <Compile Include="AnalyzerTests\WhenVarRequired\BecauseExpressionHasCast.cs" />
-    <Compile Include="AnalyzerTests\WhenVarRequired\BecauseExpressionIsConstructor.cs" />
-    <Compile Include="AnalyzerTests\WhenVarRequired\BecauseExpressionStatesTypeThroughTypeArgument.cs" />
+    <Compile Include="AnalyzerTests\WhenVarAcceptable\BecauseExpressionHasCast.cs" />
+    <Compile Include="AnalyzerTests\WhenVarAcceptable\BecauseExpressionIsConstructor.cs" />
+    <Compile Include="AnalyzerTests\WhenVarAcceptable\BecauseExpressionStatesTypeThroughTypeArgument.cs" />
     <Compile Include="AnalyzerTests\WhenVarRequired\BecauseTypeHasAnonymousArgument.cs" />
     <Compile Include="AnalyzerTests\WhenVarRequired\BecauseTypeIsAnonymous.cs" />
   </ItemGroup>

@@ -1,12 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Flyntax.AvoidVar.Test.AnalyzerTests.WhenVarRequired
+namespace Flyntax.AvoidVar.Test.AnalyzerTests.WhenVarAcceptable
 {
     [TestClass]
     public class BecauseExpressionStatesTypeThroughTypeArgument : TestBase
     {
         [TestMethod]
-        public void InitializerIsGenericMethodWithExplicitTypeArgument()
+        public void InitializerIsGenericMethodWithExplicitTypeArgumentDoesNotReportDiagnostic()
         {
             ShouldNotWarn("var x = (new int[1]).First<int>();");
         }
