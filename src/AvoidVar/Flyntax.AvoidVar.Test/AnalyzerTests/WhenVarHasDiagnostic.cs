@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Flyntax.AvoidVar.Test
+namespace Flyntax.AvoidVar.Test.AnalyzerTests
 {
     // We ignore declarations which already have diagnostics, because
     // we can't really know what's going on (and certainly can't apply
@@ -11,7 +11,7 @@ namespace Flyntax.AvoidVar.Test
         [TestMethod]
         public void WeDontAddOurOwnDiagnostic()
         {
-            VerifyCSharpDiagnostic("var x =;");
+            ShouldNotWarn("var x =;");
         }
     }
 }

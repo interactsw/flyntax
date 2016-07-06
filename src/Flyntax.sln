@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flyntax.AvoidVar", "AvoidVar\Flyntax.AvoidVar\Flyntax.AvoidVar\Flyntax.AvoidVar.csproj", "{5A4B4C9C-D774-4763-99BE-9200F96F336C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flyntax.AvoidVar.Test", "AvoidVar\Flyntax.AvoidVar\Flyntax.AvoidVar.Test\Flyntax.AvoidVar.Test.csproj", "{EF73E82A-9C6D-4444-AB74-0E4E57E9380F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flyntax.AvoidVar.Vsix", "AvoidVar\Flyntax.AvoidVar\Flyntax.AvoidVar.Vsix\Flyntax.AvoidVar.Vsix.csproj", "{F54DEEC9-7501-41CA-8B31-C557555E772D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AvoidVar", "AvoidVar", "{FE0394C6-FE1D-4EBF-8BF2-9AB36FA42473}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flyntax.AvoidVar", "AvoidVar\Flyntax.AvoidVar\Flyntax.AvoidVar.csproj", "{5A4B4C9C-D774-4763-99BE-9200F96F336C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flyntax.AvoidVar.Test", "AvoidVar\Flyntax.AvoidVar.Test\Flyntax.AvoidVar.Test.csproj", "{EF73E82A-9C6D-4444-AB74-0E4E57E9380F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flyntax.AvoidVar.Vsix", "AvoidVar\Flyntax.AvoidVar.Vsix\Flyntax.AvoidVar.Vsix.csproj", "{F54DEEC9-7501-41CA-8B31-C557555E772D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Flyntax.AvoidVar\Flyntax.AvoidVar.csproj">
-      <Project>{5A4B4C9C-D774-4763-99BE-9200F96F336C}</Project>
+      <Project>{5a4b4c9c-d774-4763-99be-9200f96f336c}</Project>
       <Name>Flyntax.AvoidVar</Name>
     </ProjectReference>
   </ItemGroup>

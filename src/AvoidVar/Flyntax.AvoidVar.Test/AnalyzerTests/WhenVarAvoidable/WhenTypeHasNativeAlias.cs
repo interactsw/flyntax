@@ -1,23 +1,20 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TestHelper;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Flyntax.AvoidVar.Test.WhenVarAvoidable
+namespace Flyntax.AvoidVar.Test.AnalyzerTests.WhenVarAvoidable
 {
     [TestClass]
     public class WhenTypeHasNativeAlias : TestBase
     {
-        // int, string, etc.
-
         [TestMethod]
         public void Int32()
         {
             ShouldWarn("var x = Environment.TickCount;", "int");
+        }
+
+        [TestMethod]
+        public void Int64()
+        {
+            ShouldWarn("var x = new object[0].LongLength;", "long");
         }
 
         [TestMethod]

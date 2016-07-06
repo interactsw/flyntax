@@ -1,11 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TestHelper;
 
 namespace Flyntax.AvoidVar.Test
@@ -46,16 +41,23 @@ namespace Flyntax.AvoidVar.Test
             return new FlyntaxAvoidVarAnalyzer();
         }
 
+        protected void ShouldNotWarn(string statement) => VerifyCSharpDiagnostic(WrapStatement(statement));
+
         protected void ShouldWarn(string statement, string expectedTypeName)
         {
             var expected = new DiagnosticResult
             {
                 Id = "AvoidVar",
-                Message = $"Use 'simpleTypeName' instead of 'var'",
+                Message = $"Use '{expectedTypeName}' instead of 'var'",
                 Severity = DiagnosticSeverity.Warning,
                 Locations = new[] { ResultLocation }
             };
             VerifyCSharpDiagnostic(WrapStatement(statement), expected);
+        }
+
+        protected void ShouldFix(string statement, string fixedStatement)
+        {
+            VerifyCSharpFix(WrapStatement(statement), WrapStatement(fixedStatement));
         }
     }
 }

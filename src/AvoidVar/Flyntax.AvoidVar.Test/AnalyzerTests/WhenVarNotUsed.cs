@@ -1,11 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Flyntax.AvoidVar.Test
+namespace Flyntax.AvoidVar.Test.AnalyzerTests
 {
     [TestClass]
     public class WhenVarNotUsed : TestBase
@@ -13,14 +8,13 @@ namespace Flyntax.AvoidVar.Test
         [TestMethod]
         public void NoDeclaration()
         {
-            VerifyCSharpDiagnostic(WrapStatement(""));
-
+            ShouldNotWarn("");
         }
 
         [TestMethod]
         public void TypedDeclaration()
         {
-            VerifyCSharpDiagnostic(WrapStatement("int x = Environment.TickCount;"));
+            ShouldNotWarn("int x = Environment.TickCount;");
         }
     }
 }
