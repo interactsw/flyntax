@@ -15,6 +15,16 @@ namespace Flyntax.AvoidVar
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(FlyntaxAvoidVarCodeFixProvider)), Shared]
     public class FlyntaxAvoidVarCodeFixProvider : CodeFixProvider
     {
+        /// <summary>
+        /// Analyzers that register multiple code fixes must tag them with a key to indicate
+        /// which code fixes are considered to be logically the same for the purposes of a
+        /// 'fix all' operation. (If the user elects to fix all instances of a problem in the
+        /// file, project, or solution, this is used to work out which available code fixes
+        /// represent the same problem - it's possible to register two different implementations
+        /// of a fix that are logically the same for 'fix all' purposes, apparently.)
+        /// </summary>
+        private static string FixEquivalenceClassKey => FlyntaxAvoidVarAnalyzer.DiagnosticId;
+
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
             get { return ImmutableArray.Create(FlyntaxAvoidVarAnalyzer.DiagnosticId); }
@@ -43,7 +53,8 @@ namespace Flyntax.AvoidVar
             context.RegisterCodeFix(
                 CodeAction.Create(
                     "Replace var with type",
-                    c => ReplaceVarWithType(context.Document, declaration, c)),
+                    c => ReplaceVarWithType(context.Document, declaration, c),
+                    FixEquivalenceClassKey),
                 diagnostic);
         }
 
