@@ -11,6 +11,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flyntax.AvoidVar.Test", "Av
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flyntax.AvoidVar.Vsix", "AvoidVar\Flyntax.AvoidVar.Vsix\Flyntax.AvoidVar.Vsix.csproj", "{F54DEEC9-7501-41CA-8B31-C557555E772D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@Release", "@Release", "{EF2FACAA-D8ED-436E-83A9-42C04D77F02A}"
+	ProjectSection(SolutionItems) = preProject
+		..\scripts\release\CreateGitHubRelease.ps1 = ..\scripts\release\CreateGitHubRelease.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@Build", "@Build", "{092AD9CE-ECA2-4C63-9D43-A3A4F2226241}"
+	ProjectSection(SolutionItems) = preProject
+		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
+		..\scripts\build\SetBuildVersion.ps1 = ..\scripts\build\SetBuildVersion.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
