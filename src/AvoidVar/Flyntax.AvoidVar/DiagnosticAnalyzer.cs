@@ -164,7 +164,7 @@ namespace Flyntax.AvoidVar
             {
                 SymbolInfo symbolInfoForInitializer = context.SemanticModel.GetSymbolInfo(
                     memberAccess.Expression);
-                var initializerTypeSymbol = (ITypeSymbol) symbolInfoForInitializer.Symbol;
+                var initializerTypeSymbol = symbolInfoForInitializer.Symbol as ITypeSymbol;
                 if (initializerTypeSymbol == declarationTypeSymbol)
                 {
                     return true;
