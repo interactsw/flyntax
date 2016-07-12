@@ -6,11 +6,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Rename;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Flyntax.StoreCtorArg
@@ -18,12 +17,11 @@ namespace Flyntax.StoreCtorArg
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(FlyntaxStoreCtorArgCodeFixProvider)), Shared]
     public class FlyntaxStoreCtorArgCodeFixProvider : CodeFixProvider
     {
-        private const string title = "Make uppercase";
+        private const string title = "Store in field";
+        private static string FixEquivalenceClassKey => FlyntaxStoreCtorArgAnalyzer.DiagnosticId;
 
-        public sealed override ImmutableArray<string> FixableDiagnosticIds
-        {
-            get { return ImmutableArray.Create(FlyntaxStoreCtorArgAnalyzer.DiagnosticId); }
-        }
+        public sealed override ImmutableArray<string> FixableDiagnosticIds =>
+            ImmutableArray.Create(FlyntaxStoreCtorArgAnalyzer.DiagnosticId);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -33,41 +31,139 @@ namespace Flyntax.StoreCtorArg
 
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
-            var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+            SyntaxNode root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 
-            // TODO: Replace the following code with your own analysis, generating a CodeAction for each fix to suggest
-            var diagnostic = context.Diagnostics.First();
-            var diagnosticSpan = diagnostic.Location.SourceSpan;
+            Diagnostic diagnostic = context.Diagnostics.First();
+            TextSpan diagnosticSpan = diagnostic.Location.SourceSpan;
 
-            // Find the type declaration identified by the diagnostic.
-            var declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().First();
+            ParameterSyntax parameter = root
+                .FindToken(diagnosticSpan.Start)
+                .Parent
+                .AncestorsAndSelf()
+                .OfType<ParameterSyntax>()
+                .First();
 
-            // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: title,
-                    createChangedSolution: c => MakeUppercaseAsync(context.Document, declaration, c),
-                    equivalenceKey: title),
+                    createChangedDocument: c => StoreCtorArgInField(context.Document, parameter, c),
+                    equivalenceKey: FixEquivalenceClassKey),
                 diagnostic);
         }
 
-        private async Task<Solution> MakeUppercaseAsync(Document document, TypeDeclarationSyntax typeDecl, CancellationToken cancellationToken)
+        private async Task<Document> StoreCtorArgInField(
+            Document document,
+            ParameterSyntax parameter,
+            CancellationToken cancellationToken)
         {
-            // Compute new uppercase name.
-            var identifierToken = typeDecl.Identifier;
-            var newName = identifierToken.Text.ToUpperInvariant();
+            ConstructorDeclarationSyntax ctorDecl = parameter.Parent.AncestorsAndSelf().OfType<ConstructorDeclarationSyntax>().First();
+            TypeDeclarationSyntax typeDeclaration = ctorDecl.Parent.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().First();
 
-            // Get the symbol representing the type to be renamed.
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var typeSymbol = semanticModel.GetDeclaredSymbol(typeDecl, cancellationToken);
+            SemanticModel sm = await document.GetSemanticModelAsync(cancellationToken);
+            ISymbol paramTypeSymbol = sm.GetSymbolInfo(parameter.Type).Symbol;
+            SyntaxNode root = await document.GetSyntaxRootAsync(cancellationToken)
+                .ConfigureAwait(false);
+            string fieldName = "_" + parameter.Identifier.Text;
 
-            // Produce a new solution that has all references to that type renamed, including the declaration.
-            var originalSolution = document.Project.Solution;
-            var optionSet = originalSolution.Workspace.Options;
-            var newSolution = await Renamer.RenameSymbolAsync(document.Project.Solution, typeSymbol, newName, optionSet, cancellationToken).ConfigureAwait(false);
+            var existingField = typeDeclaration
+                .Members
+                .OfType<FieldDeclarationSyntax>()
+                .FirstOrDefault(fd => fd.Declaration.Variables.Any(v => v.Identifier.Text == fieldName));
+            if (existingField != null)
+            {
+                var si = sm.GetSymbolInfo(existingField.Declaration.Type);
+                bool existingFieldHasDifferentType = si.Symbol != paramTypeSymbol;
+                if (existingFieldHasDifferentType)
+                {
+                    // There's already a field Need to pick a different name
+                    existingField = null;
+                    for (int suffix = 1; true; ++suffix)
+                    {
+                        fieldName = "_" + parameter.Identifier.Text + suffix;
+                        if (!typeDeclaration
+                            .Members
+                            .OfType<FieldDeclarationSyntax>()
+                            .Any(fd => fd.Declaration.Variables.Any(v => v.Identifier.Text == fieldName)))
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            var fieldIdentifier = SyntaxFactory.Identifier(fieldName);
+            var fieldAssignmentStatement = SyntaxFactory.SingletonList(
+                SyntaxFactory.ExpressionStatement(
+                    SyntaxFactory.AssignmentExpression(
+                        SyntaxKind.SimpleAssignmentExpression,
+                        SyntaxFactory.IdentifierName(fieldIdentifier),
+                        SyntaxFactory.IdentifierName(parameter.Identifier))
+                        ));
+            var oldCtorBody = ctorDecl.Body;
+            var newCtorBody = oldCtorBody.ChildNodes().Count() == 0
+                ? SyntaxFactory.Block(fieldAssignmentStatement)
+                : oldCtorBody.InsertNodesBefore(
+                    oldCtorBody.ChildNodes().First(),
+                    fieldAssignmentStatement);
+            var newTypeDeclaration = typeDeclaration
+                .ReplaceNode(oldCtorBody, newCtorBody);
 
-            // Return the new solution with the now-uppercase type name.
-            return newSolution;
+            if (existingField == null)
+            {
+                var fieldVariableDeclaration = SyntaxFactory.VariableDeclaration(
+                    parameter.Type,
+                    SyntaxFactory.SingletonSeparatedList(
+                        SyntaxFactory.VariableDeclarator(fieldIdentifier)));
+                var fieldDeclarationSyntax = SyntaxFactory.FieldDeclaration(
+                            fieldVariableDeclaration)
+                            .WithModifiers(
+                                SyntaxFactory.TokenList(
+                                    SyntaxFactory.Token(SyntaxKind.PrivateKeyword),
+                                    SyntaxFactory.Token(SyntaxKind.ReadOnlyKeyword)))
+                            .WithLeadingTrivia(SyntaxFactory.Whitespace("        "));
+
+                newTypeDeclaration = newTypeDeclaration
+                    .InsertNodesBefore(
+                        FindNodeToInsertBefore(fieldName, newTypeDeclaration.Members),
+                        // newTypeDeclaration.Members.First(),
+                        SyntaxFactory.SingletonList(fieldDeclarationSyntax));
+            }
+            SyntaxNode newRoot = root.ReplaceNode(
+                typeDeclaration,
+                newTypeDeclaration);
+
+            return document.WithSyntaxRoot(newRoot);
+        }
+
+        private static SyntaxNode FindNodeToInsertBefore(
+            string identifierText,
+            IEnumerable<SyntaxNode> items)
+        {
+            bool useNext = true;
+            SyntaxNode result = null;
+            foreach (SyntaxNode node in items)
+            {
+                if (useNext)
+                {
+                    result = node;
+                    useNext = false;
+                }
+
+                var fieldDeclaration = node as FieldDeclarationSyntax;
+                if (fieldDeclaration != null)
+                {
+                    if (fieldDeclaration.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword) &&
+                        fieldDeclaration.Modifiers.Any(m => m.Kind() == SyntaxKind.ReadOnlyKeyword))
+                    {
+                        if (fieldDeclaration.Declaration.Variables.All(v =>
+                            StringComparer.OrdinalIgnoreCase.Compare(v.Identifier.Text, identifierText) < 0))
+                        {
+                            useNext = true;
+                        }
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }

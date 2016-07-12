@@ -109,6 +109,12 @@
     <Compile Include="AnalyzerTests\WhenArgUsed\WhenStored.cs" />
     <Compile Include="AnalyzerTests\WhenConstructorHasOtherDiagnostics.cs" />
     <Compile Include="AnalyzerTests\WhenNoArgs.cs" />
+    <Compile Include="CodeFixTests\FixTestBase.cs" />
+    <Compile Include="CodeFixTests\WhenClassHasNoFields.cs" />
+    <Compile Include="CodeFixTests\WhenClassHasOnlyMutableFields.cs" />
+    <Compile Include="CodeFixTests\WhenClassHasReadOnlyFieldsInOrder.cs" />
+    <Compile Include="CodeFixTests\WhenFieldWithRequiredNamePresentButHasWrongType.cs" />
+    <Compile Include="CodeFixTests\WhenRequiredFieldPresentButNotAssignedFromCtor.cs" />
     <Compile Include="ShouldNotWarnBase.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.cs" />

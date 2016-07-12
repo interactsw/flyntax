@@ -7,7 +7,7 @@ namespace Flyntax.StoreCtorArg.Test
 {
     public abstract class TestBase : CodeFixVerifier
     {
-        private const string Skeleton = @"
+        protected const string Skeleton = @"
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,10 +20,9 @@ namespace ConsoleApplication1
     class TypeName : Base
     {{
 {0}
-        public TypeName({1}) {2}
+        public TypeName({1}){2}
         {{
-            {3}
-        }}
+        {3}}}
     }}
     class Base
     {{
@@ -41,7 +40,7 @@ namespace ConsoleApplication1
         protected virtual string Body => "";
 
         protected string Wrap() => 
-            string.Format(Skeleton, Fields, ArgumentList, BaseCall, Body);
+            string.Format(Skeleton, Fields, ArgumentList, BaseCall == "" ? "" : " " + BaseCall , Body);
 
         protected void ShouldNotWarn() => VerifyCSharpDiagnostic(Wrap());
 
