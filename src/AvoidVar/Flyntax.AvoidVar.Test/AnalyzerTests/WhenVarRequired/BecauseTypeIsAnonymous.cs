@@ -16,5 +16,11 @@ namespace Flyntax.AvoidVar.Test.AnalyzerTests.WhenVarRequired
         {
             ShouldNotWarn("var x = new int[1].Select(i => new { x = 42, y = 99 }).Single();");
         }
+
+        [TestMethod]
+        public void AnonymousTypeInForEach()
+        {
+            ShouldNotWarn("foreach (var x in new int[1].Select(i => new { x = 42, y = 99 })) { Console.WriteLine(x); }");
+        }
     }
 }

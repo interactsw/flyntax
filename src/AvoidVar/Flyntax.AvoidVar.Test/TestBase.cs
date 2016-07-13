@@ -27,7 +27,10 @@ namespace Flyntax.AvoidVar.Test
 {1}
     }}";
 
-        protected static readonly DiagnosticResultLocation ResultLocation = new DiagnosticResultLocation("Test0.cs", 15, 17);
+        protected DiagnosticResultLocation ResultLocation =>
+            new DiagnosticResultLocation("Test0.cs", 15, 17 + DiagnosticHorizontalOffset);
+
+        protected virtual int DiagnosticHorizontalOffset => 0;
 
         protected static string WrapStatement(string statement) => WrapStatement(statement, "");
         protected static string WrapStatement(string statement, string atNamespaceScope) =>

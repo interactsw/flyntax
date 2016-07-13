@@ -5,10 +5,23 @@ namespace Flyntax.AvoidVar.Test.AnalyzerTests.WhenVarAvoidable
     [TestClass]
     public class WhenTypeIsPlainClass : TestBase
     {
+        private int _offset = 0;
+        protected override int DiagnosticHorizontalOffset => _offset;
+
         [TestMethod]
-        public void PlainClass()
+        public void VariableInitializationWithPlainClassShouldWarn()
         {
             ShouldWarn("var x = Environment.OSVersion;", "OperatingSystem");
         }
+
+        [TestMethod]
+        public void ForeachOverPlainClassShouldWarn()
+        {
+            _offset = 9;
+            ShouldWarn(
+                "foreach (var x in System.Linq.Enumerable.Range(1, 10)) { Console.WriteLine(x); }",
+                "int");
+        }
+
     }
 }

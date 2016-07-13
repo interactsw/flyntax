@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Threading;
@@ -15,15 +16,8 @@ namespace Flyntax.AvoidVar
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(FlyntaxAvoidVarCodeFixProvider)), Shared]
     public class FlyntaxAvoidVarCodeFixProvider : CodeFixProvider
     {
-        /// <summary>
-        /// Analyzers that register multiple code fixes must tag them with a key to indicate
-        /// which code fixes are considered to be logically the same for the purposes of a
-        /// 'fix all' operation. (If the user elects to fix all instances of a problem in the
-        /// file, project, or solution, this is used to work out which available code fixes
-        /// represent the same problem - it's possible to register two different implementations
-        /// of a fix that are logically the same for 'fix all' purposes, apparently.)
-        /// </summary>
-        private static string FixEquivalenceClassKey => FlyntaxAvoidVarAnalyzer.DiagnosticId;
+        private static string LocalVarFixEquivalenceClassKey => FlyntaxAvoidVarAnalyzer.DiagnosticId + "LocalVar";
+        private static string ForEachFixEquivalenceClassKey => FlyntaxAvoidVarAnalyzer.DiagnosticId + "ForEach";
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
@@ -41,21 +35,66 @@ namespace Flyntax.AvoidVar
             SyntaxNode root = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                 .ConfigureAwait(false);
 
+
+            switch (context.Diagnostics.First().Properties["type"])
+            {
+                case FlyntaxAvoidVarAnalyzer.TargetIsLocalDeclaration:
+                    RegisterCodeFix<LocalDeclarationStatementSyntax>(
+                        context, root, ReplaceVarWithType, LocalVarFixEquivalenceClassKey);
+                    break;
+
+                case FlyntaxAvoidVarAnalyzer.TargetIsForEach:
+                    RegisterCodeFix<ForEachStatementSyntax>(
+                        context, root, ReplaceForeachVarWithType, ForEachFixEquivalenceClassKey);
+                    break;
+            }
+        }
+
+        private void RegisterCodeFix<TSyntax>(
+            CodeFixContext context,
+            SyntaxNode root,
+            Func<Document, TSyntax, CancellationToken, Task<Document>> handler,
+            string equivalenceClassKey)
+        {
             // Find the local declaration statement identified by the diagnostic.
             Diagnostic diagnostic = context.Diagnostics.First();
             TextSpan diagnosticSpan = diagnostic.Location.SourceSpan;
-            LocalDeclarationStatementSyntax declaration = root.FindToken(diagnosticSpan.Start)
+            TSyntax syntax = root.FindToken(diagnosticSpan.Start)
                 .Parent
                 .AncestorsAndSelf()
-                .OfType<LocalDeclarationStatementSyntax>()
+                .OfType<TSyntax>()
                 .First();
 
             context.RegisterCodeFix(
                 CodeAction.Create(
                     "Replace var with type",
-                    c => ReplaceVarWithType(context.Document, declaration, c),
-                    FixEquivalenceClassKey),
+                    c => handler(context.Document, syntax, c),
+                    equivalenceClassKey),
                 diagnostic);
+        }
+
+        private async Task<Document> ReplaceForeachVarWithType(
+            Document document,
+            ForEachStatementSyntax foreachStatement,
+            CancellationToken cancellationToken)
+        {
+            SemanticModel sm = await document.GetSemanticModelAsync(cancellationToken)
+                .ConfigureAwait(false);
+            var feinfo = sm.GetForEachStatementInfo(foreachStatement);
+            ITypeSymbol variableTypeSymbol = feinfo.ElementType;
+
+            string proposedTypeName = variableTypeSymbol.ToMinimalDisplayString(
+                sm, foreachStatement.Type.SpanStart);
+
+            SyntaxNode root = await document.GetSyntaxRootAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            SyntaxNode newRoot = root.ReplaceNode(
+                foreachStatement.Type,
+                SyntaxFactory.ParseTypeName(proposedTypeName)
+                    .WithLeadingTrivia(foreachStatement.Type.GetLeadingTrivia())
+                    .WithTrailingTrivia(foreachStatement.Type.GetTrailingTrivia()));
+            return document.WithSyntaxRoot(newRoot);
         }
 
         private async Task<Document> ReplaceVarWithType(
