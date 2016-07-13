@@ -27,6 +27,7 @@ $AssemblyVersionReplacement = "AssemblyVersion(""$basicVersion"""
 $nuspecs = Get-ChildItem src -Recurse -Include *.nuspec
 foreach ($nuspectFile in $nuspecs)
 {
+    Write-Output "Updating $nuspectFile"
     [xml] $nuspec = Get-Content $nuspectFile
     $nuspec.package.metadata.version = $fullVersionNumber
     $nuspec.Save($nuspectFile)
@@ -35,6 +36,7 @@ foreach ($nuspectFile in $nuspecs)
 $vsixs =  Get-ChildItem src -Recurse -Include *.vsixmanifest
 foreach ($vsixFile in $vsixs)
 {
+    Write-Output "Updating $vsixFile"
     [xml] $vsixmanifest = Get-Content $vsixFile
     $vsixmanifest.PackageManifest.Metadata.Identity.Version = $fullVersionNumber
     $vsixmanifest.Save($vsixFile)
