@@ -118,13 +118,11 @@ namespace Flyntax.StoreCtorArg
                             .WithModifiers(
                                 SyntaxFactory.TokenList(
                                     SyntaxFactory.Token(SyntaxKind.PrivateKeyword),
-                                    SyntaxFactory.Token(SyntaxKind.ReadOnlyKeyword)))
-                            .WithLeadingTrivia(SyntaxFactory.Whitespace("        "));
+                                    SyntaxFactory.Token(SyntaxKind.ReadOnlyKeyword)));
 
                 newTypeDeclaration = newTypeDeclaration
                     .InsertNodesBefore(
                         FindNodeToInsertBefore(fieldName, newTypeDeclaration.Members),
-                        // newTypeDeclaration.Members.First(),
                         SyntaxFactory.SingletonList(fieldDeclarationSyntax));
             }
             SyntaxNode newRoot = root.ReplaceNode(
