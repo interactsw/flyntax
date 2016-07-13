@@ -9,9 +9,15 @@ namespace Flyntax.AvoidVar.Test.AnalyzerTests
     public class WhenVarHasDiagnostic : TestBase
     {
         [TestMethod]
-        public void WeDontAddOurOwnDiagnostic()
+        public void InLocalDeclarationWeDontAddOurOwnDiagnostic()
         {
             ShouldNotWarn("var x =;");
+        }
+
+        [TestMethod]
+        public void InForEachWeDontAddOurOwnDiagnostic()
+        {
+            ShouldNotWarn("foreach (var x in ) { Console.WriteLine(x); }");
         }
     }
 }

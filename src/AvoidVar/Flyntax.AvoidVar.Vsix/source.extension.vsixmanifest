@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="Flyntax.AvoidVar..7b8cf727-de18-4707-87ff-f36173f7d94e" Version="1.0.1" Language="en-US" Publisher="Ian Griffiths"/>
+    <Identity Id="Flyntax.AvoidVar..7b8cf727-de18-4707-87ff-f36173f7d94e" Version="1.0.2" Language="en-US" Publisher="Ian Griffiths"/>
     <DisplayName>Flyntax - Avoid var</DisplayName>
     <Description xml:space="preserve">C# diagnostic and code fix that detects uses of the 'var' keyword in which the type is not explicit in the initializer expression, and offers to replace 'var' with the type name.</Description>
     <MoreInfo>https://github.com/interactsw/flyntax</MoreInfo>

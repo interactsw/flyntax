@@ -12,9 +12,9 @@ namespace Flyntax.AvoidVar.Test.AnalyzerTests.WhenVarRequired
         }
 
         [TestMethod]
-        public void ForeachOverCollectionWithAnonymousElementTypeShouldNotWarn()
+        public void ForeachOverCollectionOfCollectionsOfAnonymousTypesShouldNotWarn()
         {
-            ShouldNotWarn("foreach (var x in (new int[1]).Select(i => new { i }) { Console.WriteLine(x.i); }");
+            ShouldNotWarn("foreach (var x in new[] { (new int[1]).Select(i => new { i }) }) { Console.WriteLine(x[0].i); }");
         } 
     }
 }

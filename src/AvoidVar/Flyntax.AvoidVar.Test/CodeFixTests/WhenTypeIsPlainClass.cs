@@ -17,8 +17,8 @@ namespace Flyntax.AvoidVar.Test.CodeFixTests
         public void FixesForeachOverPlainClass()
         {
             ShouldFix(
-                "foreach (var x = Enumerable.Range(1, 10)) { Console.WriteLine(x); }",
-                "foreach (int x = Enumerable.Range(1, 10)) { Console.WriteLine(x); }");
+                "foreach (var x in Enumerable.Range(1, 10)) { Console.WriteLine(x); }",
+                "foreach (int x in Enumerable.Range(1, 10)) { Console.WriteLine(x); }");
         }
     }
 }

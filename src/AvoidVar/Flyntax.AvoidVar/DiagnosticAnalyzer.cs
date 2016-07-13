@@ -12,6 +12,9 @@ namespace Flyntax.AvoidVar
     {
         public const string DiagnosticId = "AvoidVar";
 
+        public const string TargetIsForEach = "ForEach";
+        public const string TargetIsLocalDeclaration = "LocalDeclaration";
+
         // You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
         // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/Localizing%20Analyzers.md for more on localization
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AnalyzerTitle), Resources.ResourceManager, typeof(Resources));
@@ -35,20 +38,21 @@ namespace Flyntax.AvoidVar
         private void OnForEach(SyntaxNodeAnalysisContext context)
         {
             var statement = (ForEachStatementSyntax) context.Node;
-            // TODO: test for this:
-            //if (statement.ContainsDiagnostics)
-            //{
-            //    // User probably still typing, so wait until it looks valid.
-            //    return;
-            //}
+            if (statement.ContainsDiagnostics)
+            {
+                // User probably still typing, so wait until it looks valid.
+                return;
+            }
             TypeSyntax variableManifestType = statement.Type;
             if (!statement.Type.IsVar)
             {
                 return;
             }
 
-            SymbolInfo symbolInfoForVariableType = context.SemanticModel.GetSymbolInfo(variableManifestType);
-            var variableTypeSymbol = (ITypeSymbol) symbolInfoForVariableType.Symbol;
+            var feinfo = context.SemanticModel.GetForEachStatementInfo(statement);
+            
+            //SymbolInfo symbolInfoForVariableType = context.SemanticModel.GetForEachStatementInfo(statement);
+            ITypeSymbol variableTypeSymbol = feinfo.ElementType;
             if (variableTypeSymbol == null)
             {
                 // We can't do anything if we don't know the type.
@@ -62,11 +66,18 @@ namespace Flyntax.AvoidVar
                 return;
             }
 
-            string proposedTypeName = symbolInfoForVariableType.Symbol.ToMinimalDisplayString(
-                context.SemanticModel, declarationManifestType.SpanStart);
+            if (IsUnspeakable(variableTypeSymbol))
+            {
+                // Turns out var is necessary.
+                return;
+            }
+
+            string proposedTypeName = variableTypeSymbol.ToMinimalDisplayString(
+                context.SemanticModel, variableManifestType.SpanStart);
             context.ReportDiagnostic(Diagnostic.Create(
                 Rule,
-                declaration.Type.GetLocation(),
+                variableManifestType.GetLocation(),
+                ImmutableDictionary.Create<string, string>().Add("type", TargetIsForEach),
                 proposedTypeName));
         }
 
@@ -119,6 +130,7 @@ namespace Flyntax.AvoidVar
             context.ReportDiagnostic(Diagnostic.Create(
                 Rule,
                 declaration.Type.GetLocation(),
+                ImmutableDictionary.Create<string, string>().Add("type", TargetIsLocalDeclaration),
                 proposedTypeName));
         }
 
