@@ -3,8 +3,8 @@
   [string]$AssemblyInfoPath
 )
 
-$majorMinorVersionNumber = "1.0"
-$thirdVersionPart = "2"
+$majorMinorVersionNumber = "1.1"
+$thirdVersionPart = "0"
 $basicVersion = $majorMinorVersionNumber + ".0.0"
 $fullVersionNumber = $majorMinorVersionNumber + "." + $thirdVersionPart + "." + $BuildCounter
 
