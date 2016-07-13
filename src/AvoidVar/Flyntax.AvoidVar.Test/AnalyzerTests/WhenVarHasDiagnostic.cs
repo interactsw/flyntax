@@ -19,5 +19,11 @@ namespace Flyntax.AvoidVar.Test.AnalyzerTests
         {
             ShouldNotWarn("foreach (var x in ) { Console.WriteLine(x); }");
         }
+
+        [TestMethod]
+        public void InUsingWeDontAddOurOwnDiagnostic()
+        {
+            ShouldNotWarn("using (var x = ) { Console.WriteLine(x); }");
+        }
     }
 }

@@ -47,6 +47,11 @@ namespace Flyntax.AvoidVar
                     RegisterCodeFix<ForEachStatementSyntax>(
                         context, root, ReplaceForeachVarWithType, ForEachFixEquivalenceClassKey);
                     break;
+
+                case FlyntaxAvoidVarAnalyzer.TargetIsUsingStatement:
+                    RegisterCodeFix<UsingStatementSyntax>(
+                        context, root, ReplaceUsingVarWithType, ForEachFixEquivalenceClassKey);
+                    break;
             }
         }
 
@@ -94,6 +99,29 @@ namespace Flyntax.AvoidVar
                 SyntaxFactory.ParseTypeName(proposedTypeName)
                     .WithLeadingTrivia(foreachStatement.Type.GetLeadingTrivia())
                     .WithTrailingTrivia(foreachStatement.Type.GetTrailingTrivia()));
+            return document.WithSyntaxRoot(newRoot);
+        }
+
+        private async Task<Document> ReplaceUsingVarWithType(
+            Document document,
+            UsingStatementSyntax usingStatement,
+            CancellationToken cancellationToken)
+        {
+            SemanticModel sm = await document.GetSemanticModelAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            TypeSyntax declarationManifestType = usingStatement.Declaration.Type;
+            SymbolInfo symbolInfoForDeclarationType = sm.GetSymbolInfo(declarationManifestType);
+            var declarationTypeSymbol = (ITypeSymbol) symbolInfoForDeclarationType.Symbol;
+
+            SyntaxNode root = await document.GetSyntaxRootAsync(cancellationToken)
+                .ConfigureAwait(false);
+            SyntaxNode newRoot = root.ReplaceNode(
+                declarationManifestType,
+                SyntaxFactory.ParseTypeName(symbolInfoForDeclarationType.Symbol.ToMinimalDisplayString(sm, declarationManifestType.SpanStart))
+                    .WithLeadingTrivia(declarationManifestType.GetLeadingTrivia())
+                    .WithTrailingTrivia(declarationManifestType.GetTrailingTrivia()));
+
             return document.WithSyntaxRoot(newRoot);
         }
 

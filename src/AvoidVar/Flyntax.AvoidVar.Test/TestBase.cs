@@ -70,6 +70,11 @@ namespace Flyntax.AvoidVar.Test
             VerifyCSharpFix(WrapStatement(statement), WrapStatement(fixedStatement));
         }
 
+        protected void ShouldFix(string statement, string atNamespaceScope, string fixedStatement)
+        {
+            VerifyCSharpFix(WrapStatement(statement, atNamespaceScope), WrapStatement(fixedStatement, atNamespaceScope));
+        }
+
         protected static string OtherTypeWithMember(string member) => @"
         class OtherType
         {

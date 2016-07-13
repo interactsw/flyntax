@@ -17,8 +17,20 @@ namespace Flyntax.AvoidVar.Test.CodeFixTests
         public void FixesForeachOverPlainClass()
         {
             ShouldFix(
-                "foreach (var x in Enumerable.Range(1, 10)) { Console.WriteLine(x); }",
-                "foreach (int x in Enumerable.Range(1, 10)) { Console.WriteLine(x); }");
+                "foreach (var x in Enumerable.Range(1, 10).Select(i => Environment.OSVersion)) { Console.WriteLine(x); }",
+                "foreach (OperatingSystem x in Enumerable.Range(1, 10).Select(i => Environment.OSVersion)) { Console.WriteLine(x); }");
+        }
+
+        [TestMethod]
+        public void FixesUsingOverPlainClass()
+        {
+            ShouldFix(
+                @"Func<Foo> foo = () => new Foo();
+                  using (var f = foo()) {}",
+                "class Foo : IDisposable { public void Dispose() {} }",
+                @"Func<Foo> foo = () => new Foo();
+                  using (Foo f = foo()) {}");
+
         }
     }
 }

@@ -23,5 +23,14 @@ namespace Flyntax.AvoidVar.Test.AnalyzerTests.WhenVarAvoidable
                 "int");
         }
 
+
+        [TestMethod]
+        public void UsingOverPlainClassShouldWarn()
+        {
+            _offset = 7;
+            ShouldWarn(
+                "using (var x = System.IO.File.Create(\"foo.bar\")) { x.WriteByte(42); }",
+                "System.IO.FileStream");
+        }
     }
 }

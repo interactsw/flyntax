@@ -14,6 +14,7 @@ namespace Flyntax.AvoidVar
 
         public const string TargetIsForEach = "ForEach";
         public const string TargetIsLocalDeclaration = "LocalDeclaration";
+        public const string TargetIsUsingStatement = "UsingStatement";
 
         // You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
         // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/Localizing%20Analyzers.md for more on localization
@@ -33,6 +34,7 @@ namespace Flyntax.AvoidVar
             //context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
             context.RegisterSyntaxNodeAction(OnLocalDeclaration, SyntaxKind.LocalDeclarationStatement);
             context.RegisterSyntaxNodeAction(OnForEach, SyntaxKind.ForEachStatement);
+            context.RegisterSyntaxNodeAction(OnUsingStatement, SyntaxKind.UsingStatement);
         }
 
         private void OnForEach(SyntaxNodeAnalysisContext context)
@@ -50,8 +52,6 @@ namespace Flyntax.AvoidVar
             }
 
             var feinfo = context.SemanticModel.GetForEachStatementInfo(statement);
-            
-            //SymbolInfo symbolInfoForVariableType = context.SemanticModel.GetForEachStatementInfo(statement);
             ITypeSymbol variableTypeSymbol = feinfo.ElementType;
             if (variableTypeSymbol == null)
             {
@@ -131,6 +131,50 @@ namespace Flyntax.AvoidVar
                 Rule,
                 declaration.Type.GetLocation(),
                 ImmutableDictionary.Create<string, string>().Add("type", TargetIsLocalDeclaration),
+                proposedTypeName));
+        }
+
+        private void OnUsingStatement(SyntaxNodeAnalysisContext context)
+        {
+            var statement = (UsingStatementSyntax) context.Node;
+            if (statement.ContainsDiagnostics)
+            {
+                // User probably still typing, so wait until it looks valid.
+                return;
+            }
+            TypeSyntax variableManifestType = statement.Declaration.Type;
+            if (!variableManifestType.IsVar)
+            {
+                return;
+            }
+
+            SymbolInfo symbolInfoForVariableType = context.SemanticModel.GetSymbolInfo(variableManifestType);
+            var variableTypeSymbol = (ITypeSymbol) symbolInfoForVariableType.Symbol;
+            if (variableTypeSymbol == null)
+            {
+                // We can't do anything if we don't know the type.
+                // This typically happens when compilation errors prevent the compiler from
+                // inferring the type. Although we bailed out earlier if there were diagnostics,
+                // we can still get here because the problem might be elsehwhere. For example,
+                // if the statement is "var x = Foo();" there won't be a diagnostic for that
+                // statement, but if Foo() is incompletely defined, the type of 'x' may be
+                // unavailable. (There will be a diagnostic in this case, but it will be attached
+                // to the definition of Foo() and not to this local declaration.)
+                return;
+            }
+
+            if (IsUnspeakable(variableTypeSymbol))
+            {
+                // Turns out var is necessary.
+                return;
+            }
+
+            string proposedTypeName = variableTypeSymbol.ToMinimalDisplayString(
+                context.SemanticModel, variableManifestType.SpanStart);
+            context.ReportDiagnostic(Diagnostic.Create(
+                Rule,
+                variableManifestType.GetLocation(),
+                ImmutableDictionary.Create<string, string>().Add("type", TargetIsUsingStatement),
                 proposedTypeName));
         }
 
