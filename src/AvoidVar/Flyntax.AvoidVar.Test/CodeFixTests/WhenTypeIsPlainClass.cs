@@ -6,11 +6,19 @@ namespace Flyntax.AvoidVar.Test.CodeFixTests
     public class WhenTypeIsPlainClass : TestBase
     {
         [TestMethod]
-        public void PlainClass()
+        public void FixesVariableInitializationWithPlainClass()
         {
             ShouldFix(
                 "var x = Environment.OSVersion;",
                 "OperatingSystem x = Environment.OSVersion;");
+        }
+
+        [TestMethod]
+        public void FixesForeachOverPlainClass()
+        {
+            ShouldFix(
+                "foreach (var x = Enumerable.Range(1, 10)) { Console.WriteLine(x); }",
+                "foreach (int x = Enumerable.Range(1, 10)) { Console.WriteLine(x); }");
         }
     }
 }

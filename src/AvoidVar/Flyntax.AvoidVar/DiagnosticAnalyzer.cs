@@ -29,8 +29,47 @@ namespace Flyntax.AvoidVar
             // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
             //context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
             context.RegisterSyntaxNodeAction(OnLocalDeclaration, SyntaxKind.LocalDeclarationStatement);
-
+            context.RegisterSyntaxNodeAction(OnForEach, SyntaxKind.ForEachStatement);
         }
+
+        private void OnForEach(SyntaxNodeAnalysisContext context)
+        {
+            var statement = (ForEachStatementSyntax) context.Node;
+            // TODO: test for this:
+            //if (statement.ContainsDiagnostics)
+            //{
+            //    // User probably still typing, so wait until it looks valid.
+            //    return;
+            //}
+            TypeSyntax variableManifestType = statement.Type;
+            if (!statement.Type.IsVar)
+            {
+                return;
+            }
+
+            SymbolInfo symbolInfoForVariableType = context.SemanticModel.GetSymbolInfo(variableManifestType);
+            var variableTypeSymbol = (ITypeSymbol) symbolInfoForVariableType.Symbol;
+            if (variableTypeSymbol == null)
+            {
+                // We can't do anything if we don't know the type.
+                // This typically happens when compilation errors prevent the compiler from
+                // inferring the type. Although we bailed out earlier if there were diagnostics,
+                // we can still get here because the problem might be elsehwhere. For example,
+                // if the statement is "var x = Foo();" there won't be a diagnostic for that
+                // statement, but if Foo() is incompletely defined, the type of 'x' may be
+                // unavailable. (There will be a diagnostic in this case, but it will be attached
+                // to the definition of Foo() and not to this local declaration.)
+                return;
+            }
+
+            string proposedTypeName = symbolInfoForVariableType.Symbol.ToMinimalDisplayString(
+                context.SemanticModel, declarationManifestType.SpanStart);
+            context.ReportDiagnostic(Diagnostic.Create(
+                Rule,
+                declaration.Type.GetLocation(),
+                proposedTypeName));
+        }
+
         private void OnLocalDeclaration(SyntaxNodeAnalysisContext context)
         {
             var statement = (LocalDeclarationStatementSyntax) context.Node;
