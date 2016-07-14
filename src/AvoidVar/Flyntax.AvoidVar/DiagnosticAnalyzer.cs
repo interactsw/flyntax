@@ -51,7 +51,7 @@ namespace Flyntax.AvoidVar
                 return;
             }
 
-            var feinfo = context.SemanticModel.GetForEachStatementInfo(statement);
+            ForEachStatementInfo feinfo = context.SemanticModel.GetForEachStatementInfo(statement);
             ITypeSymbol variableTypeSymbol = feinfo.ElementType;
             if (variableTypeSymbol == null)
             {

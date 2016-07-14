@@ -85,7 +85,7 @@ namespace Flyntax.AvoidVar
         {
             SemanticModel sm = await document.GetSemanticModelAsync(cancellationToken)
                 .ConfigureAwait(false);
-            var feinfo = sm.GetForEachStatementInfo(foreachStatement);
+            ForEachStatementInfo feinfo = sm.GetForEachStatementInfo(foreachStatement);
             ITypeSymbol variableTypeSymbol = feinfo.ElementType;
 
             string proposedTypeName = variableTypeSymbol.ToMinimalDisplayString(

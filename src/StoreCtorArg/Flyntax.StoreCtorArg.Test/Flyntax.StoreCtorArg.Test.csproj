@@ -137,6 +137,8 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <Analyzer Include="..\..\packages\Flyntax.AvoidVar.1.1.0.35\analyzers\dotnet\cs\Flyntax.AvoidVar.dll" />
+    <Analyzer Include="..\..\packages\Flyntax.StoreCtorArg.1.1.0.35\analyzers\dotnet\cs\Flyntax.StoreCtorArg.dll" />
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>

@@ -65,13 +65,13 @@ namespace Flyntax.StoreCtorArg
                 .ConfigureAwait(false);
             string fieldName = "_" + parameter.Identifier.Text;
 
-            var existingField = typeDeclaration
+            FieldDeclarationSyntax existingField = typeDeclaration
                 .Members
                 .OfType<FieldDeclarationSyntax>()
                 .FirstOrDefault(fd => fd.Declaration.Variables.Any(v => v.Identifier.Text == fieldName));
             if (existingField != null)
             {
-                var si = sm.GetSymbolInfo(existingField.Declaration.Type);
+                SymbolInfo si = sm.GetSymbolInfo(existingField.Declaration.Type);
                 bool existingFieldHasDifferentType = si.Symbol != paramTypeSymbol;
                 if (existingFieldHasDifferentType)
                 {
@@ -90,30 +90,30 @@ namespace Flyntax.StoreCtorArg
                     }
                 }
             }
-            var fieldIdentifier = SyntaxFactory.Identifier(fieldName);
-            var fieldAssignmentStatement = SyntaxFactory.SingletonList(
+            SyntaxToken fieldIdentifier = SyntaxFactory.Identifier(fieldName);
+            SyntaxList<ExpressionStatementSyntax> fieldAssignmentStatement = SyntaxFactory.SingletonList(
                 SyntaxFactory.ExpressionStatement(
                     SyntaxFactory.AssignmentExpression(
                         SyntaxKind.SimpleAssignmentExpression,
                         SyntaxFactory.IdentifierName(fieldIdentifier),
                         SyntaxFactory.IdentifierName(parameter.Identifier))
                         ));
-            var oldCtorBody = ctorDecl.Body;
-            var newCtorBody = oldCtorBody.ChildNodes().Count() == 0
+            BlockSyntax oldCtorBody = ctorDecl.Body;
+            BlockSyntax newCtorBody = oldCtorBody.ChildNodes().Count() == 0
                 ? SyntaxFactory.Block(fieldAssignmentStatement)
                 : oldCtorBody.InsertNodesBefore(
                     oldCtorBody.ChildNodes().First(),
                     fieldAssignmentStatement);
-            var newTypeDeclaration = typeDeclaration
+            TypeDeclarationSyntax newTypeDeclaration = typeDeclaration
                 .ReplaceNode(oldCtorBody, newCtorBody);
 
             if (existingField == null)
             {
-                var fieldVariableDeclaration = SyntaxFactory.VariableDeclaration(
+                VariableDeclarationSyntax fieldVariableDeclaration = SyntaxFactory.VariableDeclaration(
                     parameter.Type,
                     SyntaxFactory.SingletonSeparatedList(
                         SyntaxFactory.VariableDeclarator(fieldIdentifier)));
-                var fieldDeclarationSyntax = SyntaxFactory.FieldDeclaration(
+                FieldDeclarationSyntax fieldDeclarationSyntax = SyntaxFactory.FieldDeclaration(
                             fieldVariableDeclaration)
                             .WithModifiers(
                                 SyntaxFactory.TokenList(
