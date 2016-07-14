@@ -16,7 +16,7 @@ $CommonVersionsCsContent = Get-Content $CommonVersionsCsFile -Encoding UTF8
 $AssemblyFileVersionRegex = 'AssemblyFileVersion\(\"(?<p1>\d+)\.(?<p2>\d+)\.(?<p3>\d+)\.(?<p4>\d+)\"'
 $FileVersionReplacement = "AssemblyFileVersion(""$fullVersionNumber"""
 $AssemblyVersionRegex = 'AssemblyVersion\(\"(?<p1>\d+)\.(?<p2>\d+)\.(?<p3>\d+)\.(?<p4>\d+)\"'
-$AssemblyVersionReplacement = "AssemblyVersion(""$basicVersion"""
+$AssemblyVersionReplacement = "AssemblyVersion(""$fullVersionNumber"""
 ($CommonVersionsCsContent -replace $AssemblyFileVersionRegex, $FileVersionReplacement) `
  -replace $AssemblyVersionRegex, $AssemblyVersionReplacement `
  | Out-File $CommonVersionsCsFile -Encoding UTF8
