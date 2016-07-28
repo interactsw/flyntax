@@ -1,26 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>Flyntax.AvoidVar</id>
+    <id>Flyntax.All</id>
     <version>9999.0.0.0</version>
-    <title>Flyntax.AvoidVar</title>
+    <title>Flyntax</title>
     <authors>Interact Software</authors>
     <owners>idg10</owners>
     <licenseUrl>https://github.com/interactsw/flyntax/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/interactsw/flyntax</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/interactsw/flyntax/master/art/AvoidVar.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/interactsw/flyntax/master/art/Flyntax.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>C# diagnostic and code fix that detects uses of the 'var' keyword in which the type is not explicit in the initializer expression, and offers to replace 'var' with the type name.</description>
+    <description>All of the Flyntax C# diagnostics and code fixes in one package.</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright © 2016 Ian Griffiths</copyright>
-    <tags>Flyntax, Flyntax.AvoidVar, analyzers</tags>
+    <tags>Flyntax, Flyntax.AvoidVar, Flyntax.StoreCtorArg, analyzers</tags>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System" targetFramework="" />
     </frameworkAssemblies>
   </metadata>
   <!-- The convention for analyzers is to put language agnostic dlls in analyzers\portable50 and language specific analyzers in either analyzers\portable50\cs or analyzers\portable50\vb -->
   <files>
-    <file src="*.dll" target="analyzers\dotnet\cs" exclude="**\Microsoft.CodeAnalysis.*;**\System.Collections.Immutable.*;**\System.Reflection.Metadata.*;**\System.Composition.*" />
+    <file src="*.dll"
+          target="analyzers\dotnet\cs"
+          exclude="**\Microsoft.CodeAnalysis.*;**\System.Collections.Immutable.*;**\System.Reflection.Metadata.*;**\System.Composition.*;Flyntax.All.dll" />
     <file src="tools\*.ps1" target="tools\" />
   </files>
 </package>
