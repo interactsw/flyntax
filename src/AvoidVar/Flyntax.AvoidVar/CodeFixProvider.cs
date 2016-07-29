@@ -16,8 +16,7 @@ namespace Flyntax.AvoidVar
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(FlyntaxAvoidVarCodeFixProvider)), Shared]
     public class FlyntaxAvoidVarCodeFixProvider : CodeFixProvider
     {
-        private static string LocalVarFixEquivalenceClassKey => FlyntaxAvoidVarAnalyzer.DiagnosticId + "LocalVar";
-        private static string ForEachFixEquivalenceClassKey => FlyntaxAvoidVarAnalyzer.DiagnosticId + "ForEach";
+        private static string FixEquivalenceClassKey => FlyntaxAvoidVarAnalyzer.DiagnosticId;
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
@@ -40,17 +39,17 @@ namespace Flyntax.AvoidVar
             {
                 case FlyntaxAvoidVarAnalyzer.TargetIsLocalDeclaration:
                     RegisterCodeFix<LocalDeclarationStatementSyntax>(
-                        context, root, ReplaceVarWithType, LocalVarFixEquivalenceClassKey);
+                        context, root, ReplaceVarWithType, FixEquivalenceClassKey);
                     break;
 
                 case FlyntaxAvoidVarAnalyzer.TargetIsForEach:
                     RegisterCodeFix<ForEachStatementSyntax>(
-                        context, root, ReplaceForeachVarWithType, ForEachFixEquivalenceClassKey);
+                        context, root, ReplaceForeachVarWithType, FixEquivalenceClassKey);
                     break;
 
                 case FlyntaxAvoidVarAnalyzer.TargetIsUsingStatement:
                     RegisterCodeFix<UsingStatementSyntax>(
-                        context, root, ReplaceUsingVarWithType, ForEachFixEquivalenceClassKey);
+                        context, root, ReplaceUsingVarWithType, FixEquivalenceClassKey);
                     break;
             }
         }
