@@ -64,8 +64,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\..\packages\Flyntax.AvoidVar.1.1.0.35\analyzers\dotnet\cs\Flyntax.AvoidVar.dll" />
-    <Analyzer Include="..\..\packages\Flyntax.StoreCtorArg.1.1.0.35\analyzers\dotnet\cs\Flyntax.StoreCtorArg.dll" />
+    <Analyzer Include="..\..\packages\Flyntax.All.1.1.2.41\analyzers\dotnet\cs\Flyntax.AvoidVar.dll" />
+    <Analyzer Include="..\..\packages\Flyntax.All.1.1.2.41\analyzers\dotnet\cs\Flyntax.StoreCtorArg.dll" />
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
