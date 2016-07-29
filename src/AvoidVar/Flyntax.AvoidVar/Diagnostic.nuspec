@@ -11,7 +11,7 @@
     <iconUrl>https://raw.githubusercontent.com/interactsw/flyntax/master/art/AvoidVar.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>C# diagnostic and code fix that detects uses of the 'var' keyword in which the type is not explicit in the initializer expression, and offers to replace 'var' with the type name.</description>
-    <releaseNotes></releaseNotes>
+    <releaseNotes>See Flyntax.All for release notes</releaseNotes>
     <copyright>Copyright © 2016 Ian Griffiths</copyright>
     <tags>Flyntax, Flyntax.AvoidVar, analyzers</tags>
     <frameworkAssemblies>

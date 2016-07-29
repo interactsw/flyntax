@@ -11,7 +11,7 @@
     <iconUrl>https://raw.githubusercontent.com/interactsw/flyntax/master/art/StoreCtorArg.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>C# diagnostic and code fix that detects unused constructor arguments, and offers to generate a read-only field initialized with the argument</description>
-    <releaseNotes></releaseNotes>
+    <releaseNotes>See Flyntax.All for release notes</releaseNotes>
     <copyright>Copyright</copyright>
     <tags>Flyntax, Flyntax.StoreCtorArg, analyzers</tags>
     <frameworkAssemblies>

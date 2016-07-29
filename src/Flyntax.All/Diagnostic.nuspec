@@ -11,9 +11,9 @@
     <iconUrl>https://raw.githubusercontent.com/interactsw/flyntax/master/art/Flyntax.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>All of the Flyntax C# diagnostics and code fixes in one package.</description>
-    <releaseNotes></releaseNotes>
+    <releaseNotes>Fixed bug where using declarations without a variable declaration were mishandled.</releaseNotes>
     <copyright>Copyright © 2016 Ian Griffiths</copyright>
-    <tags>Flyntax, Flyntax.AvoidVar, Flyntax.StoreCtorArg, analyzers</tags>
+    <tags>Flyntax, Flyntax.AvoidVar, Flyntax.StoreCtorArg, analyzers. All three AvoidVar cases (variables, foreach, using) are now handled as equivalent for the purposes of fixing all issues in the solution.</tags>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System" targetFramework="" />
     </frameworkAssemblies>
