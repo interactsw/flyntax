@@ -23,7 +23,6 @@ namespace Flyntax.AvoidVar.Test.AnalyzerTests.WhenVarAvoidable
                 "int");
         }
 
-
         [TestMethod]
         public void UsingOverPlainClassShouldWarn()
         {

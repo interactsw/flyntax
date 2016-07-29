@@ -16,5 +16,11 @@ namespace Flyntax.AvoidVar.Test.AnalyzerTests
         {
             ShouldNotWarn("int x = Environment.TickCount;");
         }
+
+        [TestMethod]
+        public void UsingWithoutDeclaration()
+        {
+            ShouldNotWarn("using (System.IO.File.Create(\"foo.bar\")) { }");
+        }
     }
 }

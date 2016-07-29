@@ -142,6 +142,15 @@ namespace Flyntax.AvoidVar
                 // User probably still typing, so wait until it looks valid.
                 return;
             }
+            if (statement.Declaration == null)
+            {
+                // Must be of the form:
+                //  using (something.OrOther())
+                //  ...
+                // (You're not required to have a var in there.)
+                return;
+            }
+
             TypeSyntax variableManifestType = statement.Declaration.Type;
             if (!variableManifestType.IsVar)
             {

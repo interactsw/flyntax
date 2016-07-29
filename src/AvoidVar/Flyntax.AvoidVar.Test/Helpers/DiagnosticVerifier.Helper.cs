@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -57,8 +58,24 @@ namespace TestHelper
             var diagnostics = new List<Diagnostic>();
             foreach (Project project in projects)
             {
-                CompilationWithAnalyzers compilationWithAnalyzers = project.GetCompilationAsync().Result.WithAnalyzers(ImmutableArray.Create(analyzer));
+                var exceptions = new List<Exception>();
+                var options = new CompilationWithAnalyzersOptions(
+                    null,
+                    (e, a, d) => exceptions.Add(e),
+                    true,
+                    true);
+                Compilation c = project.GetCompilationAsync().Result;
+                CompilationWithAnalyzers compilationWithAnalyzers = c.WithAnalyzers(ImmutableArray.Create(analyzer), options);
                 ImmutableArray<Diagnostic> diags = compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync().Result;
+                if (exceptions.Count == 1)
+                {
+                    throw exceptions[0];
+                }
+                else if (exceptions.Count > 1)
+                {
+                    throw new AggregateException(exceptions);
+                }
+
                 foreach (Diagnostic diag in diags)
                 {
                     if (diag.Location == Location.None || diag.Location.IsInMetadata)
